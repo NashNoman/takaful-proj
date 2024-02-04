@@ -13,7 +13,7 @@ const firebaseConfig = {
   storageBucket: "takaful-solution.appspot.com",
   messagingSenderId: "288179252116",
   appId: "1:288179252116:web:cb9711bc69168f7cb23d81",
-  measurementId: "G-G0T7PDT4NX"
+  measurementId: "G-G0T7PDT4NX",
 };
 
 // Initialize Firebase
