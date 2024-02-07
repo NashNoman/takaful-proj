@@ -40,7 +40,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} min-h-screen`}>
         <div className="py-2 px-4 border-b">
           <Link href="/">
             <p className="font-extrabold text-lg">Takaful</p>
