@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main>
+    <main className="text-center">
       <section className="pt-20">
         <h1 className="font-extrabold text-4xl mb-20">
           Lorem ipsum dolor sit, amet consectetur adipisicing elit.

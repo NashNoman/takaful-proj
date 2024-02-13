@@ -6,3 +6,23 @@
   --foreground-rgb: 255, 255, 255;
   --background-start-rgb: 0, 0, 0;
 }
+
+/* .PhoneInput {
+  @apply w-full flex items-center;
+}
+
+.PhoneInputCountry {
+  @apply flex;
+}
+
+.PhoneInputCountry select {
+  @apply w-10;
+}
+
+.PhoneInputCountryIconImg {
+  @apply w-8 h-8;
+}
+
+.PhoneInputInput {
+  @apply p-1 outline outline-gray-300 outline-2 rounded-sm flex-grow ml-2 focus-within:outline-black;
+} */

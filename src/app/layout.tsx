@@ -46,7 +46,7 @@ export default function RootLayout({
             <p className="font-extrabold text-lg">Takaful</p>
           </Link>
         </div>
-        <div className="container p-4 text-center">{children}</div>
+        <div className="container p-4">{children}</div>
       </body>
     </html>
   );

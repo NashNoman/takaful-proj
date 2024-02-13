@@ -1,8 +1,13 @@
 import FormInput from "@/components/FormInput";
+import { Controller } from "react-hook-form";
+// import PhoneInput from "react-phone-number-input";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 
 type InfoFormProps = {
   register: any;
   errors: any;
+  controller?: any;
 };
 
 export function PersonalInfo({ register, errors }: InfoFormProps) {
@@ -63,16 +68,14 @@ export function LocationInfo({ register, errors }: InfoFormProps) {
   );
 }
 
-export function CredentialsInfo({ register, errors }: InfoFormProps) {
+export function CredentialsInfo({
+  register,
+  errors,
+  controller,
+}: InfoFormProps) {
   return (
     <>
-      <FormInput
-        label="Phone Number"
-        name="phone"
-        type="number"
-        register={register}
-        errors={errors}
-      />
+      <PhoneNumberInput errors={errors} controller={controller} />
       <FormInput
         label="Email Address (optional)"
         name="email"
@@ -88,11 +91,40 @@ export function CredentialsInfo({ register, errors }: InfoFormProps) {
       />
       <FormInput
         label="Confirm Password"
-        type="password"
         name="confirmPassword"
+        type="password"
         register={register}
         errors={errors}
       />
     </>
+  );
+}
+
+export function PhoneNumberInput({
+  errors,
+  controller,
+}: {
+  errors: any;
+  controller: any;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <label htmlFor="phone">Phone Number</label>
+      <Controller
+        control={controller}
+        name="phone"
+        render={({ field }) => (
+          <PhoneInput
+            {...field}
+            country="ye"
+            containerClass="w-full"
+            inputClass="!w-full"
+          />
+        )}
+      />
+      {errors.phone?.message && (
+        <p className="text-red-500 text-sm">{errors.phone.message}</p>
+      )}
+    </div>
   );
 }
