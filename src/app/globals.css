@@ -7,22 +7,23 @@
   --background-start-rgb: 0, 0, 0;
 }
 
-/* .PhoneInput {
-  @apply w-full flex items-center;
+::-webkit-scrollbar {
+  width: 5px;
+  background: #f5f5f5;
 }
 
-.PhoneInputCountry {
-  @apply flex;
+/* This will change the color of the scroll thumb (the part you drag) */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 2.5px;
 }
 
-.PhoneInputCountry select {
-  @apply w-10;
+/* This will change the color of the scroll thumb when you hover over it */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
-.PhoneInputCountryIconImg {
-  @apply w-8 h-8;
+/* This will add a smooth transition effect when you hover over the scroll thumb */
+::-webkit-scrollbar-thumb {
+  transition: background 0.3s ease-in-out;
 }
-
-.PhoneInputInput {
-  @apply p-1 outline outline-gray-300 outline-2 rounded-sm flex-grow ml-2 focus-within:outline-black;
-} */
