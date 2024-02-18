@@ -1,10 +1,10 @@
 {
-  "id": "2",
+  "id": "3",
   "name": "Takaful Microinsurance",
   "short_name": "Takaful",
   "theme_color": "#FFFFFF",
   "background_color": "#FFFFFF",
-  "start_url": "/",
+  "start_url": "/app",
   "display": "standalone",
   "orientation": "portrait",
   "prefer_related_application": true,

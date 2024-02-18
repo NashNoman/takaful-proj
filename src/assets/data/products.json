@@ -1,0 +1,44 @@
+{
+  "users": [
+    {
+      "first_name": "John",
+      "middle_name": "Doe",
+      "last_name": "Smith",
+      "phone_number": "+12345678910",
+      "email": "johnsmith@gmail.com",
+      "password": "",
+      "date_of_birth": "1990-01-01",
+      "address": {
+        "city": "New York",
+        "street": "123 Main St"
+      },
+      "gender": true,
+      "occupation": "Manager",
+      "avg_income": 1000,
+      "type": "admin"
+    }
+  ],
+  "products": [
+    {
+      "name": "Motorcycle Insurance",
+      "description": "Motorcycle insurance insures your personal motorcycle against liability and damage. Motorcycle insurance may also provide financial protection against theft of the bike and possible damage to the bike, sustained from accidents, fire, vandalism, and natural disasters.",
+      "basePremium": "5"
+    },
+    {
+      "name": "Mini-Truck Insurance",
+      "description": "Mini-truck insurance insures your personal mini-truck against liability and damage. Mini-truck insurance may also provide financial protection against theft of the mini-truck and possible damage to the mini-truck, sustained from accidents, fire, vandalism, and natural disasters.",
+      "basePremium": "5"
+    },
+    {
+      "name": "Mini-Van Insurance",
+      "description": "Mini-van insurance insures your personal mini-van against liability and damage. Mini-van insurance may also provide financial protection against theft of the mini-van and possible damage to the mini-van, sustained from accidents, fire, vandalism, and natural disasters.",
+      "basePremium": "5"
+    },
+    {
+      "name": "Health Insurance",
+      "description": "Health insurance is an insurance that covers the whole or a part of the risk of a person incurring medical expenses, spreading the risk over a large number of persons. By estimating the overall risk of health care and health system expenses, among a targeted group, an insurer can develop a routine finance structure, such as a monthly premium or payroll tax, to ensure that money is available to pay for the health care benefits specified in the insurance agreement.",
+      "basePremium": "5"
+    }
+  ],
+  "coverage": []
+}
