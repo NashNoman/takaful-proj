@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,8 +6,8 @@ import { ArrowRightCircle } from "lucide-react";
 import React, { useState } from "react";
 
 export default function page() {
-  const [chat, setChat] = useState();
-  const [message, setMessage] = useState();
+  // const [chat, setChat] = useState();
+  // const [message, setMessage] = useState();
 
   return (
     <>
