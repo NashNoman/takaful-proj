@@ -82,6 +82,7 @@ createStore(
   },
   {
     name: "signupForm",
+    storageType: localStorage,
   },
 );
 

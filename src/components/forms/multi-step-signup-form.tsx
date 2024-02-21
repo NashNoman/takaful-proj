@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import FormInputField from "@/components/forms/ui/form-input-field";
-import { useStateMachine } from "little-state-machine";
+import { GlobalState, useStateMachine } from "little-state-machine";
 import { register } from "@/lib/actions/auth";
 import { LoaderIcon } from "lucide-react";
 import { signIn } from "next-auth/react";
@@ -93,8 +93,8 @@ const updateProducts = (state: any, payload: any) => {
 type FormField = keyof SignupInputs;
 
 export default function MultiStepSignupForm() {
-  const onSubmit = async (values: SignupInputs) => {
-    if (values.password !== values.confirmPassword) {
+  const onSubmit = async (values: GlobalState) => {
+    if (values.formData.password !== values.formData.confirmPassword) {
       form.setError("confirmPassword", {
         type: "manual",
         message: "Passwords do not match",
@@ -102,12 +102,12 @@ export default function MultiStepSignupForm() {
       return;
     }
 
-    const res = await register(values);
+    const res = await register(values.formData);
 
     if (!res?.error) {
       await signIn("credentials", {
-        phoneOrEmail: values.phoneNumber,
-        password: values.password,
+        phoneOrEmail: values.formData.phoneNumber,
+        password: values.formData.password,
         callbackUrl: "/signup/package",
       });
       return;

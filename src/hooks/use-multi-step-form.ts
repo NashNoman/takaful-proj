@@ -1,5 +1,6 @@
+import { policies } from "@/db/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useStateMachine } from "little-state-machine";
+import { GlobalState, useStateMachine } from "little-state-machine";
 import { useState } from "react";
 import { FieldValues, Path, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -20,7 +21,7 @@ export default function useMultiStepForm<T extends FieldValues>({
   steps: Step[];
   schema: ZodSchema;
   updateState: (state: any, payload: Partial<T>) => any;
-  onSubmit: (data: T) => void;
+  onSubmit: (data: GlobalState) => void;
 }) {
   const [index, setIndex] = useState({
     current: 0,
@@ -52,7 +53,9 @@ export default function useMultiStepForm<T extends FieldValues>({
     if (index.current === steps.length - 1) {
       setIsLoading(true);
       try {
-        await onSubmit({ ...state, ...values });
+        await onSubmit({
+          ...state,
+        });
       } catch (error) {
         toast("An error occurred, please try again", {
           closeButton: true,

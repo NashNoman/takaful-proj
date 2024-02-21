@@ -16,10 +16,8 @@ type Props = {
 export default async function layout({ children }: Props) {
   const session = await getServerSession();
 
-  if (!session || !session.user) redirect("/");
-
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col pt-10">
       <HomeNav />
       {children}
       {/* <AppBottomNav /> */}

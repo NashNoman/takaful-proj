@@ -12,16 +12,24 @@ export const register = async (data: SignupInputs) => {
   try {
     const validationResult = SignupSchema.safeParse(data);
 
+    console.log(validationResult);
+
     if (!validationResult.success) {
       return { error: validationResult.error.errors };
     }
 
+    let cond = or(
+      eq(users.email, data.email),
+      eq(users.phoneNumber, data.phoneNumber),
+    );
+
+    if (!data.email) {
+      cond = eq(users.phoneNumber, data.phoneNumber);
+    }
+
     const existingUser = await db.query.users
       .findFirst({
-        where: or(
-          eq(users.email, data.email),
-          eq(users.phoneNumber, data.phoneNumber),
-        ),
+        where: cond,
       })
       .execute();
 
@@ -56,7 +64,9 @@ export const register = async (data: SignupInputs) => {
       })
       .returning({ id: users.id });
   } catch (error) {
-    return { error };
+    console.log(error);
+
+    return { error: "Something went wrong" };
   }
 };
 

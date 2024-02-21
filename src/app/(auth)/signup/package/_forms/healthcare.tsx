@@ -33,6 +33,7 @@ import {
 import { CardContent } from "@mui/material";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useRouter } from "next/navigation";
+import { GlobalState } from "little-state-machine";
 
 const steps = [
   {
@@ -93,7 +94,7 @@ const updateState = (state: any, payload: any) => {
 export default function HealthCareForm() {
   const router = useRouter();
 
-  const onSubmit = async (data: HealthCareInputs) => {
+  const onSubmit = async (data: GlobalState) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     localStorage.setItem("details", JSON.stringify(data));
     router.push("/app");
