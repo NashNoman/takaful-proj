@@ -23,7 +23,7 @@ export default function Chat() {
 
   useEffect(() => {
     setPageTitle("Claims");
-  }, []);
+  }, [setPageTitle]);
 
   const handleSend = () => {
     if (!message.trim()) return;

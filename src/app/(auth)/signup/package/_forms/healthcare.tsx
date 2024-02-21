@@ -492,6 +492,7 @@ function ChoosePlanForm({
       {additionalCoverage.map((cov) => {
         return (
           <Card
+            key={cov.id}
             className={
               cov.isChecked ? "border-primary" : "bg-gray-200 text-gray-500"
             }
