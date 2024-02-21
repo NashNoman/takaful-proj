@@ -439,14 +439,14 @@ function ChoosePlanForm({
       name: "Hospitalization coverage",
       desc: "Covers hospital stays and surgeries up to 50% only.",
       isChecked: false,
-      price: 2,
+      price: 5,
     },
     {
       id: 2,
       name: "Medication",
       desc: "Any medications are 50% covered.",
       isChecked: false,
-      price: 2,
+      price: 5,
     },
   ]);
 
@@ -466,7 +466,7 @@ function ChoosePlanForm({
         <CardHeader>
           <CardTitle className="text-xl flex justify-between">
             <span>Basic Plan</span>
-            <span className="font-thin text-base">$5/MO</span>
+            <span className="font-thin text-base">$10/MO</span>
           </CardTitle>
           <CardDescription>
             The following is the basic coverage plan
