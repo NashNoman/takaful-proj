@@ -16,7 +16,7 @@ export default function HomeNav() {
   return (
     <div className="py-2 px-6 z-10 bg-background fixed top-0 w-full flex justify-between items-center">
       {pathname === "/app" ? (
-        <Link href="/app" className="flex gap-1 items-center">
+        <Link href="/" className="flex gap-1 items-center">
           <Image
             src="/Takaful-logo.png"
             alt="Takaful Logo"
