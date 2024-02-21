@@ -23,7 +23,7 @@ export default function useMultiStepForm<T extends FieldValues>({
   onSubmit: (data: T) => void;
 }) {
   const [index, setIndex] = useState({
-    current: 5,
+    current: 0,
     delta: true,
   });
   const [isLoading, setIsLoading] = useState(false);
