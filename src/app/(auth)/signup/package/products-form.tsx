@@ -4,7 +4,7 @@ export default function ProductsForm() {
   return (
     <>
       <div className="px-4 relative flex justify-center items-center">
-        {index.current > 0 && (
+        {/* {index.current > 0 && (
           <Button
             size="icon"
             variant="ghost"
@@ -22,7 +22,7 @@ export default function ProductsForm() {
             height={40}
             className="my-5"
           />
-        </Link>
+        </Link> */}
       </div>
     </>
   );

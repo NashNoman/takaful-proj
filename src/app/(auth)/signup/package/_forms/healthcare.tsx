@@ -24,70 +24,70 @@ const steps = [
 type FormField = keyof SignupInputs;
 
 export default function page() {
-  const [index, setIndex] = useState({
-    current: 0,
-    delta: true,
-  });
-  const [isLoading, setIsLoading] = useState(false);
+  // const [index, setIndex] = useState({
+  //   current: 0,
+  //   delta: true,
+  // });
+  // const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<SignupInputs>({
-    resolver: zodResolver(SignupSchema),
-  });
+  // const form = useForm<SignupInputs>({
+  //   resolver: zodResolver(SignupSchema),
+  // });
 
-  const { actions, state } = useStateMachine();
+  // const { actions, state } = useStateMachine();
 
-  const next = async () => {
-    const fields = steps[index.current].fields;
+  // const next = async () => {
+  //   const fields = steps[index.current].fields;
 
-    const output = await form.trigger(fields as FormField[]);
+  //   const output = await form.trigger(fields as FormField[]);
 
-    const values = form.getValues();
+  //   const values = form.getValues();
 
-    actions.updateProducts(values);
+  //   actions.updateProducts(values);
 
-    if (!output) return;
+  //   if (!output) return;
 
-    if (index.current < steps.length) {
-      if (index.current === steps.length - 1) {
-        setIsLoading(true);
+  //   if (index.current < steps.length) {
+  //     if (index.current === steps.length - 1) {
+  //       setIsLoading(true);
 
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+  //       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-        setIsLoading(false);
+  //       setIsLoading(false);
 
-        // try {
-        //   await register(state);
-        //   console.log("successful");
-        // } catch (error) {
-        //   console.error(error);
-        // } finally {
-        //   setIsLoading(false);
-        // }
+  //       // try {
+  //       //   await register(state);
+  //       //   console.log("successful");
+  //       // } catch (error) {
+  //       //   console.error(error);
+  //       // } finally {
+  //       //   setIsLoading(false);
+  //       // }
 
-        return;
-      }
+  //       return;
+  //     }
 
-      setIndex((prev) => ({
-        current: prev.current + 1,
-        delta: true,
-      }));
-    }
-  };
+  //     setIndex((prev) => ({
+  //       current: prev.current + 1,
+  //       delta: true,
+  //     }));
+  //   }
+  // };
 
-  const prev = () => {
-    if (index.current > 0) {
-      setIndex((prev) => ({
-        current: prev.current - 1,
-        delta: false,
-      }));
-    }
-  };
+  // const prev = () => {
+  //   if (index.current > 0) {
+  //     setIndex((prev) => ({
+  //       current: prev.current - 1,
+  //       delta: false,
+  //     }));
+  //   }
+  // };
 
-  const CurrentForm = steps[index.current].form;
+  // const CurrentForm = steps[index.current].form;
 
   return (
     <main>
-      <div className="px-4 relative flex justify-center items-center">
+      {/* <div className="px-4 relative flex justify-center items-center">
         {index.current > 0 && (
           <Button
             size="icon"
@@ -116,11 +116,9 @@ export default function page() {
         <p className="text-black/70 text-sm">
           {steps[index.current].description}
         </p>
-      </div>
+      </div> */}
 
-      {/* Form Start */}
-
-      <div className="container pb-5 overflow-x-hidden">
+      {/* <div className="container pb-5 overflow-x-hidden">
         <Form {...form}>
           <form className="flex flex-col gap-5">
             <motion.div
@@ -133,6 +131,7 @@ export default function page() {
               className="flex flex-col gap-4"
             >
               <CurrentForm form={form} defaultValues={state} />
+              <div />
             </motion.div>
             <Button
               className="w-full max-w-[30rem] mt-6 mx-auto"
@@ -145,7 +144,7 @@ export default function page() {
             </Button>
           </form>
         </Form>
-      </div>
+      </div> */}
     </main>
   );
 }
