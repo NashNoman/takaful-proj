@@ -1,8 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { HeaderTitleContext } from "@/context/nav-header-context";
 import { CameraIcon, ImagePlus, LucideCamera } from "lucide-react";
-import React, { useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 type Message = {
   id: number;
@@ -18,6 +19,11 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [message, setMessage] = useState("");
   const mediaUploader = useRef(null);
+  const [pageTitle, setPageTitle] = useContext(HeaderTitleContext);
+
+  useEffect(() => {
+    setPageTitle("Claims");
+  }, []);
 
   const handleSend = () => {
     if (!message.trim()) return;

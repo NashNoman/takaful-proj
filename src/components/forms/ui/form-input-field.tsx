@@ -1,5 +1,6 @@
 import {
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -15,6 +16,8 @@ type Props = {
   render?: (field: any) => JSX.Element;
   defaultValue?: any;
   autoFocus?: boolean;
+  disabled?: boolean;
+  description?: string;
 };
 
 export default function FormInputField({
@@ -25,6 +28,8 @@ export default function FormInputField({
   render,
   defaultValue,
   autoFocus,
+  disabled,
+  description,
 }: Props) {
   type = type || "text";
 
@@ -33,11 +38,12 @@ export default function FormInputField({
       control={form.control}
       shouldUnregister
       name={name}
-      defaultValue={defaultValue[name]}
+      disabled={disabled}
+      defaultValue={defaultValue?.[name]}
       render={({ field }) => {
         return (
           <FormItem>
-            <FormLabel>{label}</FormLabel>
+            <FormLabel className="font-semibold">{label}</FormLabel>
             <FormControl>
               {render ? (
                 render(field)
@@ -50,6 +56,7 @@ export default function FormInputField({
                 />
               )}
             </FormControl>
+            {description && <FormDescription>{description}</FormDescription>}
             <FormMessage />
           </FormItem>
         );

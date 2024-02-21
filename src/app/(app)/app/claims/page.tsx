@@ -13,7 +13,7 @@ export default function page() {
 
   return (
     <>
-      <main className="overflow-y-hidden flex-1 bg-red-100">
+      <main className="overflow-y-hidden flex-1">
         <ScrollArea className="h-full">
           <Chat />
         </ScrollArea>

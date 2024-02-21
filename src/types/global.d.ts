@@ -1,3 +1,8 @@
+import {
+  HealthCareInputs,
+  MiniVanInputs,
+  MotorcycleInputs,
+} from "@/lib/zod/register-policy-schema";
 import { SignupInputs } from "@/lib/zod/signup-schema";
 
 interface Window {
@@ -8,6 +13,12 @@ interface Window {
 declare module "little-state-machine" {
   interface GlobalState {
     formData: SignupInputs;
+    policies: {
+      healthcare: HealthCareInputs;
+      motorcycle: MotorcycleInputs;
+      miniVan: MiniVanInputs;
+      miniTruck: MiniTruckInputs;
+    };
   }
 }
 

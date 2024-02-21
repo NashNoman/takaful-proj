@@ -23,7 +23,7 @@ export default function useMultiStepForm<T extends FieldValues>({
   onSubmit: (data: T) => void;
 }) {
   const [index, setIndex] = useState({
-    current: 0,
+    current: 5,
     delta: true,
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -35,9 +35,13 @@ export default function useMultiStepForm<T extends FieldValues>({
   const next = async () => {
     if (isLoading) return;
 
+    console.log(steps[index.current].fields as Path<T>[]);
+
     const isValid = await form.trigger(
       steps[index.current].fields as Path<T>[],
     );
+
+    console.log(isValid);
 
     if (!isValid) return;
 

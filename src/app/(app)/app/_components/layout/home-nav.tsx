@@ -1,15 +1,17 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { HeaderTitleContext } from "@/context/nav-header-context";
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import { BellIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
+import React, { useContext } from "react";
 
 export default function HomeNav() {
   const pathname = usePathname();
+  const [pageTitle] = useContext(HeaderTitleContext);
 
   return (
     <div className="py-2 px-6 z-10 bg-background fixed top-0 w-full flex justify-between items-center">
@@ -31,6 +33,9 @@ export default function HomeNav() {
           />
         </Button>
       )}
+
+      <p className="font-bold">{pageTitle}</p>
+
       <span className="text-slate-500">
         <BellIcon className="fill-current h-5 w-5" />
       </span>
