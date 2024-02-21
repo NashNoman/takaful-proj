@@ -3,8 +3,9 @@ import bcrypt from "bcryptjs";
 import { db } from "@/db";
 import { eq, or } from "drizzle-orm";
 import { users } from "@/db/schema";
+import { AuthOptions } from "next-auth";
 
-export const authOptions = {
+export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -12,6 +13,7 @@ export const authOptions = {
         phoneOrEmail: { label: "Phone Number or Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
+
       async authorize(credentials) {
         if (
           !credentials ||
@@ -48,4 +50,22 @@ export const authOptions = {
       },
     }),
   ],
+  secret: process.env.NEXTAUTH_URL,
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
+    updateAge: 24 * 60 * 60,
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return { ...token, ...user };
+    },
+    async session({ session, token }) {
+      session.user = token.user;
+      return session;
+    },
+  },
 };

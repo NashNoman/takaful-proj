@@ -1,9 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Roboto } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import AuthProvider from "@/components/providers/auth-provider";
 
-const inter = Inter({ subsets: ["latin"] });
+// const inter = Inter({ subsets: ["latin"] });
+const roboto = Roboto({
+  weight: ["400", "500", "700"],
+  subsets: ["latin"],
+});
 
 const APP_NAME = "Takaful";
 const APP_DEFAULT_TITLE = "Takaful Microinsurance";
@@ -40,8 +45,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className}`}>
-        {children}
+      <body className={`${roboto.className}`}>
+        <AuthProvider>{children}</AuthProvider>
         <Toaster />
       </body>
     </html>

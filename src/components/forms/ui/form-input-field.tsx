@@ -13,6 +13,7 @@ type Props = {
   name: string;
   type?: string;
   render?: (field: any) => JSX.Element;
+  defaultValue?: any;
   autoFocus?: boolean;
 };
 
@@ -22,6 +23,7 @@ export default function FormInputField({
   name,
   type,
   render,
+  defaultValue,
   autoFocus,
 }: Props) {
   type = type || "text";
@@ -31,19 +33,27 @@ export default function FormInputField({
       control={form.control}
       shouldUnregister
       name={name}
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>{label}</FormLabel>
-          <FormControl>
-            {render ? (
-              render(field)
-            ) : (
-              <Input {...field} type={type} autoFocus={autoFocus} />
-            )}
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
+      defaultValue={defaultValue[name]}
+      render={({ field }) => {
+        return (
+          <FormItem>
+            <FormLabel>{label}</FormLabel>
+            <FormControl>
+              {render ? (
+                render(field)
+              ) : (
+                <Input
+                  {...field}
+                  type={type}
+                  autoFocus={autoFocus}
+                  autoComplete="off"
+                />
+              )}
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        );
+      }}
     />
   );
 }

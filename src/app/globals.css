@@ -58,6 +58,28 @@
   }
 }
 
+.MuiInputBase-input {
+  @apply !py-2 !px-3 !rounded-md;
+}
+
+.MuiInputBase-root {
+  @apply !rounded-md;
+}
+
+.MuiInputBase-root fieldset {
+  @apply !border-input;
+}
+
+.container-snap::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.container-snap {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
 @layer utilities {
   .bg-shine {
     background: linear-gradient(120deg, #fbdf93 0%, #f5d057 50%, #fbe893 100%);

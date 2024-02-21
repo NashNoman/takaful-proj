@@ -1,5 +1,7 @@
 "use client";
 
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider, MobileDatePicker } from "@mui/x-date-pickers";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -9,9 +11,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { PRODUCTS } from "@/constants/products";
 import { SignupInputs, SignupSchema } from "@/lib/zod/signup-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,7 +22,6 @@ import { useState } from "react";
 import { UseFormReturn, useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { DatePicker } from "@/components/ui/date-picker";
 import {
   Select,
   SelectContent,
@@ -31,8 +30,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import FormInputField from "@/components/forms/ui/form-input-field";
+import { useStateMachine } from "little-state-machine";
+import { register } from "@/lib/actions/auth";
+import { LoaderIcon } from "lucide-react";
+import { signIn } from "next-auth/react";
+import { Input } from "@/components/ui/input";
+import dayjs from "dayjs";
+import useMultiStepForm from "@/hooks/use-multi-step-form";
 import { toast } from "sonner";
-import { subYears } from "date-fns";
 
 const steps = [
   {
@@ -70,76 +75,165 @@ const steps = [
   {
     title: "Help us verify its You!",
     description: "Make sure to enter your primary phone number and email",
-    fields: ["phoneNumber", "email", "password", "confirmPassword"],
+    fields: ["ssn", "phoneNumber", "email", "password", "confirmPassword"],
     form: CredentialsInfo,
   },
 ];
 
+const updateProducts = (state: any, payload: any) => {
+  return {
+    ...state,
+    formData: {
+      ...state.formData,
+      ...payload,
+    },
+  };
+};
+
 type FormField = keyof SignupInputs;
 
 export default function MultiStepSignupForm() {
-  const [index, setIndex] = useState({
-    current: 0,
-    delta: true,
-  });
-  const [isLoading, setIsLoading] = useState(false);
+  // const [index, setIndex] = useState({
+  //   current: 0,
+  //   delta: true,
+  // });
+  // const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<SignupInputs>({
-    resolver: zodResolver(SignupSchema),
-  });
+  // const form = useForm<SignupInputs>({
+  //   resolver: zodResolver(SignupSchema),
+  // });
 
-  const onSubmit = async (data: SignupInputs) => {
-    console.log(data);
-    setIsLoading(false);
-  };
+  // const {
+  //   actions,
+  //   state: { formData },
+  // } = useStateMachine({ updateProducts });
 
-  const next = async () => {
-    const fields = steps[index.current].fields;
+  // const next = async () => {
+  //   const fields = steps[index.current].fields;
 
-    const output = await form.trigger(fields as FormField[]);
+  //   const output = await form.trigger(fields as FormField[]);
 
-    if (!output) return;
+  //   const values = form.getValues();
 
-    if (index.current < steps.length - 1) {
-      if (index.current === steps.length - 1) {
-        setIsLoading(true);
-        form
-          .handleSubmit(onSubmit)()
-          .then(() => {
-            // setIsLoading(false);
-          })
-          .catch(() => {
-            toast("Something went wrong", {
-              className: "bg-red-500 text-white",
-            });
-          })
-          .finally(() => {
-            setIsLoading(false);
-          });
-      }
+  //   actions.updateProducts(values);
 
-      setIndex((prev) => ({
-        current: prev.current + 1,
-        delta: true,
-      }));
+  //   if (!output) return;
+
+  //   if (index.current < steps.length) {
+  //     if (index.current === steps.length - 1) {
+  //       if (values.password !== values.confirmPassword) {
+  //         form.setError("confirmPassword", {
+  //           type: "manual",
+  //           message: "Passwords do not match",
+  //         });
+  //         return;
+  //       }
+
+  //       setIsLoading(true);
+
+  //       await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  //       setIsLoading(false);
+
+  //       try {
+  //         const res = await register(formData);
+
+  //         if (res?.error) {
+  //           console.error(res.error);
+  //           return;
+  //         }
+
+  //         console.log("successful");
+
+  //         await signIn("credentials", {
+  //           phoneOrEmail: formData.phoneNumber,
+  //           password: formData.password,
+  //           callbackUrl: "/signup/package",
+  //         });
+  //       } catch (error) {
+  //         console.error(error);
+  //       } finally {
+  //         setIsLoading(false);
+  //       }
+
+  //       return;
+  //     }
+
+  //     setIndex((prev) => ({
+  //       current: prev.current + 1,
+  //       delta: true,
+  //     }));
+  //   }
+  // };
+
+  // const prev = () => {
+  //   if (index.current > 0) {
+  //     setIndex((prev) => ({
+  //       current: prev.current - 1,
+  //       delta: false,
+  //     }));
+  //   }
+  // };
+
+  const onSubmit = async (values: SignupInputs) => {
+    if (values.password !== values.confirmPassword) {
+      form.setError("confirmPassword", {
+        type: "manual",
+        message: "Passwords do not match",
+      });
+      return;
+    }
+
+    const res = await register(values);
+
+    if (!res?.error) {
+      await signIn("credentials", {
+        phoneOrEmail: values.phoneNumber,
+        password: values.password,
+        callbackUrl: "/signup/package",
+      });
+      return;
+    }
+
+    console.error(res.error);
+
+    if (Array.isArray(res.error)) {
+      toast("An error occurred, please try again", {
+        closeButton: true,
+        className:
+          "bg-destructive text-destructive-foreground border-destructive-foreground",
+      });
+    } else {
+      toast(res.error as string, {
+        closeButton: true,
+        className:
+          "bg-destructive text-destructive-foreground border-destructive-foreground",
+      });
     }
   };
 
-  const prev = () => {
-    if (index.current > 0) {
-      setIndex((prev) => ({
-        current: prev.current - 1,
-        delta: false,
-      }));
-    }
-  };
+  const { currentIndex, next, prev, isLoading, delta, form, state } =
+    useMultiStepForm<SignupInputs>({
+      steps,
+      onSubmit,
+      schema: SignupSchema,
+      updateState: (state, payload) => {
+        return {
+          ...state,
+          formData: {
+            ...state.formData,
+            ...payload,
+          },
+        };
+      },
+    });
 
-  const CurrentForm = steps[index.current].form;
+  const CurrentForm = steps[currentIndex].form;
 
   return (
     <>
       <div className="px-4 relative flex justify-center items-center">
-        {index.current > 0 && (
+        {currentIndex > 0 && (
           <Button
             size="icon"
             variant="ghost"
@@ -153,19 +247,17 @@ export default function MultiStepSignupForm() {
           <Image
             src="/Takaful-logo.png"
             alt="Takaful Logo"
-            width={50}
-            height={50}
+            width={40}
+            height={40}
             className="my-5"
           />
         </Link>
       </div>
 
       <div className="container text-center pb-10">
-        <h1 className="font-bold text-3xl mb-5">
-          {steps[index.current].title}
-        </h1>
+        <h1 className="font-bold text-3xl mb-5">{steps[currentIndex].title}</h1>
         <p className="text-black/70 text-sm">
-          {steps[index.current].description}
+          {steps[currentIndex].description}
         </p>
       </div>
 
@@ -173,38 +265,39 @@ export default function MultiStepSignupForm() {
 
       <div className="container pb-5 overflow-x-hidden">
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-5"
-          >
+          <form className="flex flex-col gap-5">
             <motion.div
-              key={index.current}
-              initial={
-                index.delta ? { x: 100, opacity: 0 } : { x: -100, opacity: 0 }
-              }
+              key={currentIndex}
+              initial={delta ? { x: 100, opacity: 0 } : { x: -100, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.3 }}
               className="flex flex-col gap-4"
             >
-              <CurrentForm form={form} />
+              <CurrentForm form={form} defaultValues={state.formData} />
             </motion.div>
           </form>
-          <Button
-            className="w-full max-w-[30rem] mt-6 mx-auto"
-            size="lg"
-            onClick={!isLoading ? next : () => {}}
-            type="button"
-            // disabled={index.current === steps.length - 1}
-          >
-            Next
-          </Button>
         </Form>
+        <Button
+          className="w-full max-w-[30rem] mt-6 mx-auto"
+          size="lg"
+          onClick={!isLoading ? next : () => {}}
+          type="button"
+          disabled={isLoading}
+        >
+          {isLoading ? <LoaderIcon className="animate-spin" /> : "Next"}
+        </Button>
       </div>
     </>
   );
 }
 
-function ProductSelectForm({ form }: { form: UseFormReturn<SignupInputs> }) {
+function ProductSelectForm({
+  form,
+  defaultValues,
+}: {
+  form: UseFormReturn<SignupInputs>;
+  defaultValues: SignupInputs;
+}) {
   return (
     <>
       <div className="grid grid-cols-2 gap-4 pt-1">
@@ -241,6 +334,7 @@ function ProductSelectForm({ form }: { form: UseFormReturn<SignupInputs> }) {
                             field.value?.[name as keyof typeof field.value]
                           }
                           onCheckedChange={(checked: boolean) => {
+                            // actions.updateProducts({ [name]: checked });
                             field.onChange({
                               ...field.value,
                               [name]: checked,
@@ -265,44 +359,72 @@ function ProductSelectForm({ form }: { form: UseFormReturn<SignupInputs> }) {
   );
 }
 
-function PersonalInfo({ form }: { form: UseFormReturn<SignupInputs> }) {
+function PersonalInfo({
+  form,
+  defaultValues,
+}: {
+  form: UseFormReturn<SignupInputs>;
+  defaultValues: SignupInputs;
+}) {
   return (
     <>
       <FormInputField
+        defaultValue={defaultValues}
         form={form}
         label="First Name"
         name="firstName"
         autoFocus
       />
-      <FormInputField form={form} label="Middle Name" name="middleName" />
-      <FormInputField form={form} label="Last Name" name="lastName" />
+      <FormInputField
+        defaultValue={defaultValues}
+        form={form}
+        label="Middle Name"
+        name="middleName"
+      />
+      <FormInputField
+        form={form}
+        label="Last Name"
+        name="lastName"
+        defaultValue={defaultValues}
+      />
     </>
   );
 }
 
-function PersonalInfoContd({ form }: { form: UseFormReturn<SignupInputs> }) {
+function PersonalInfoContd({
+  form,
+  defaultValues,
+}: {
+  form: UseFormReturn<SignupInputs>;
+  defaultValues: SignupInputs;
+}) {
   return (
-    <>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
       <FormInputField
+        defaultValue={defaultValues}
         form={form}
         label="Date of Birth"
         name="dateOfBirth"
-        render={(field) => (
-          <DatePicker
+        render={(field: any) => (
+          <MobileDatePicker
             className="w-full"
-            value={field.value}
-            onChange={(date) => {
-              field.onChange(date);
-            }}
+            {...field}
+            value={dayjs(field.value || defaultValues.dateOfBirth)}
+            defaultValue={dayjs(field.value || defaultValues.dateOfBirth)}
           />
         )}
       />
       <FormInputField
+        defaultValue={defaultValues}
         form={form}
         label="Gender"
         name="gender"
-        render={(field) => (
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
+        render={(field: any) => (
+          <Select
+            onValueChange={field.onChange}
+            // defaultValue={field.value || defaultValues.gender}
+            defaultValue={defaultValues.gender}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Select your gender" />
             </SelectTrigger>
@@ -313,34 +435,62 @@ function PersonalInfoContd({ form }: { form: UseFormReturn<SignupInputs> }) {
           </Select>
         )}
       />
-    </>
+    </LocalizationProvider>
   );
 }
 
-function LocationInfo({ form }: { form: UseFormReturn<SignupInputs> }) {
-  return (
-    <>
-      <FormInputField form={form} label="City" name="city" autoFocus />
-      <FormInputField form={form} label="Street" name="street" />
-    </>
-  );
-}
-
-function OccupationInfo({ form }: { form: UseFormReturn<SignupInputs> }) {
+function LocationInfo({
+  form,
+  defaultValues,
+}: {
+  form: UseFormReturn<SignupInputs>;
+  defaultValues: SignupInputs;
+}) {
   return (
     <>
       <FormInputField
+        form={form}
+        label="City"
+        name="city"
+        defaultValue={defaultValues}
+        autoFocus
+      />
+      <FormInputField
+        form={form}
+        label="Street"
+        name="street"
+        defaultValue={defaultValues}
+      />
+    </>
+  );
+}
+
+function OccupationInfo({
+  form,
+  defaultValues,
+}: {
+  form: UseFormReturn<SignupInputs>;
+  defaultValues: SignupInputs;
+}) {
+  return (
+    <>
+      <FormInputField
+        defaultValue={defaultValues}
         form={form}
         label="Occupation"
         name="occupation"
         autoFocus
       />
       <FormInputField
+        defaultValue={defaultValues}
         form={form}
         label="Source of Income"
         name="sourceOfIncome"
-        render={(field) => (
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
+        render={(field: any) => (
+          <Select
+            onValueChange={field.onChange}
+            defaultValue={defaultValues.sourceOfIncome}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Select source of income" />
             </SelectTrigger>
@@ -353,6 +503,7 @@ function OccupationInfo({ form }: { form: UseFormReturn<SignupInputs> }) {
         )}
       />
       <FormInputField
+        defaultValue={defaultValues}
         form={form}
         type="number"
         label="Average Income"
@@ -362,25 +513,61 @@ function OccupationInfo({ form }: { form: UseFormReturn<SignupInputs> }) {
   );
 }
 
-function CredentialsInfo({ form }: { form: UseFormReturn<SignupInputs> }) {
+function CredentialsInfo({
+  form,
+  defaultValues,
+}: {
+  form: UseFormReturn<SignupInputs>;
+  defaultValues: SignupInputs;
+}) {
   return (
     <>
       <FormInputField
+        defaultValue={defaultValues}
         form={form}
         label="Social Security Number (SSN)"
         name="ssn"
         autoFocus
       />
-      <FormInputField form={form} label="Phone Number" name="phoneNumber" />
       <FormInputField
+        defaultValue={defaultValues}
+        form={form}
+        label="Phone Number"
+        name="phoneNumber"
+        render={(field: any) => (
+          <Input
+            {...field}
+            value={field.value || defaultValues.phoneNumber}
+            onChange={(e) => {
+              if (e.target.value && !e.target.value.startsWith("+967")) {
+                form.setValue("phoneNumber", "+967" + e.target.value);
+              }
+
+              field.onChange(e.target.value);
+            }}
+            type="tel"
+            autoComplete="off"
+          />
+        )}
+      />
+      <FormInputField
+        defaultValue={defaultValues}
         form={form}
         label="Email Address (optional)"
         name="email"
-        render={(field) => <Input {...field} type="email" />}
+        type="email"
       />
-      <FormInputField form={form} label="Password" name="password" />
       <FormInputField
+        defaultValue={defaultValues}
         form={form}
+        type="password"
+        label="Password"
+        name="password"
+      />
+      <FormInputField
+        defaultValue={defaultValues}
+        form={form}
+        type="password"
         label="Confirm Password"
         name="confirmPassword"
       />

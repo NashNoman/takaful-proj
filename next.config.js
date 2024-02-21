@@ -13,7 +13,10 @@ const withPWA = require("@ducanh2912/next-pwa").default({
   },
 });
 
-const nextConfig = {};
+const nextConfig = {
+  images: {
+    domains: ["images.unsplash.com"],
+  },
+};
 
-// export default withPWA(nextConfig);
 module.exports = withPWA(nextConfig);

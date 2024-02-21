@@ -34,10 +34,10 @@ export function createFirebaseAdminApp({
 
 export async function initAdmin() {
   const params = {
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID as string,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY as string,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL as string,
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET as string,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY!,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL!,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
   };
 
   return createFirebaseAdminApp(params);

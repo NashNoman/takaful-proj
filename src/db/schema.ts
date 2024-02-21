@@ -31,6 +31,7 @@ export const users = pgTable("users", {
   firstName: varchar("first_name", { length: 25 }).notNull(),
   middleName: varchar("middle_name", { length: 25 }).notNull(),
   lastName: varchar("last_name", { length: 25 }).notNull(),
+  ssn: varchar("ssn", { length: 20 }).unique().notNull(),
   phoneNumber: varchar("phone_number", { length: 20 }).unique().notNull(),
   email: varchar("email", { length: 128 }).unique(),
   password: varchar("password", { length: 256 }).unique().notNull(),
@@ -44,23 +45,17 @@ export const users = pgTable("users", {
 });
 
 export const usersRelations = relations(users, ({ one, many }) => ({
-  // package: one(packages),
+  package: one(packages),
   claims: many(claims),
-  policies: many(policies),
+  // policies: many(policies),
 }));
 
 export type Users = typeof users.$inferSelect;
-
-// export const paymentFrequencyEnum = pgEnum("payment_frequency", [
-//   "daily",
-//   "monthly",
-// ]);
 
 export const products = pgTable("products", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 50 }).unique().notNull(),
   description: text("description").notNull(),
-  // benefitSummary: text("benefit_summary").notNull(),
   isMonthly: boolean("is_monthly").default(true).notNull(),
   basePremium: integer("base_premium").notNull(),
   active: boolean("active").default(true).notNull(),
@@ -68,42 +63,43 @@ export const products = pgTable("products", {
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
 });
 
-export const productsRelations = relations(products, ({ one, many }) => ({
+export const productsRelations = relations(products, ({ many }) => ({
   policies: many(policies),
   basicCoverages: many(basicCoverage),
-  // additionalCoverages: many(additionalCoverage),
-  // productCombinations: many(productCombination),
+  additionalCoverages: many(additionalCoverage),
 }));
 
 export type Products = typeof products.$inferSelect;
 
-// export const packages = pgTable("packages", {
-//   id: serial("id").primaryKey(),
-//   customerId: integer("customer_id")
-//     .notNull()
-//     .references(() => users.id)
-//     .unique(),
-//   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
-//   discountRuleId: integer("discount_rule_id")
-//     .notNull()
-//     .references(() => discountRules.id),
-// });
+export const planTypesEnum = pgEnum("plan_types", ["monthly", "annual"]);
 
-// export const packagesRelations = relations(packages, ({ one, many }) => ({
-//   customer: one(users, {
-//     fields: [packages.customerId],
-//     references: [users.id],
-//   }),
-//   // policies: many(policies),
-//   packageToBonusCoverage: many(packageToBonusCoverage),
-//   payments: many(payments),
-//   discountRule: one(discountRules, {
-//     fields: [packages.discountRuleId],
-//     references: [discountRules.id],
-//   }),
-// }));
+export const packages = pgTable("packages", {
+  id: serial("id").primaryKey(),
+  customerId: integer("customer_id")
+    .notNull()
+    .references(() => users.id)
+    .unique(),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+  discountRuleId: integer("discount_rule_id")
+    .notNull()
+    .references(() => discountRules.id),
+  planType: planTypesEnum("plan_type").default("monthly"),
+});
 
-// export type Packages = typeof packages.$inferSelect;
+export const packagesRelations = relations(packages, ({ one, many }) => ({
+  customer: one(users, {
+    fields: [packages.customerId],
+    references: [users.id],
+  }),
+  policies: many(policies),
+  payments: many(payments),
+  discountRule: one(discountRules, {
+    fields: [packages.discountRuleId],
+    references: [discountRules.id],
+  }),
+}));
+
+export type Packages = typeof packages.$inferSelect;
 
 export const policyStatusEnum = pgEnum("policy_status", [
   "active",
@@ -116,9 +112,10 @@ export const policies = pgTable("policies", {
   productId: integer("product_id")
     .notNull()
     .references(() => products.id),
-  customerId: integer("customer_id")
-    .notNull()
-    .references(() => users.id),
+  packageId: integer("package_id").references(() => packages.id),
+  // customerId: integer("customer_id")
+  //   .notNull()
+  //   .references(() => users.id),
   startDate: date("start_date", { mode: "date" }).notNull(),
   endDate: date("end_date", { mode: "date" }).notNull(),
   status: policyStatusEnum("status").default("active").notNull(),
@@ -128,9 +125,9 @@ export const policies = pgTable("policies", {
 });
 
 export const policiesRelations = relations(policies, ({ one, many }) => ({
-  customer: one(users, {
-    fields: [policies.customerId],
-    references: [users.id],
+  package: one(packages, {
+    fields: [policies.packageId],
+    references: [packages.id],
   }),
   claims: many(claims),
   policyToAdditionalCoverage: many(policyToAdditionalCoverage),
@@ -161,12 +158,16 @@ export const claimsStatusEnum = pgEnum("claim_status", [
 
 export const claims = pgTable("claims", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
   policyId: integer("policy_id")
     .notNull()
     .references(() => policies.id),
   status: claimsStatusEnum("status").default("pending").notNull(),
   claimDate: timestamp("claim_date", { mode: "date" }).defaultNow(),
   amountClaimed: integer("amount_claimed"),
+  chatId: varchar("chat_id", { length: 128 }).unique(),
   payoutDate: timestamp("payout_date", { mode: "date" }),
 });
 
@@ -174,6 +175,10 @@ export const claimsRelations = relations(claims, ({ one }) => ({
   policy: one(policies, {
     fields: [claims.policyId],
     references: [policies.id],
+  }),
+  user: one(users, {
+    fields: [claims.userId],
+    references: [users.id],
   }),
 }));
 
@@ -185,14 +190,17 @@ export const basicCoverage = pgTable("basic_coverage", {
     .notNull()
     .references(() => products.id),
   name: varchar("name", { length: 100 }).notNull(),
-  // description: text("description").notNull(),
   benefitDetails: text("benefit_details").notNull(),
   active: boolean("active").default(true).notNull(),
-  // isOptional: boolean("is_optional").default(false).notNull(),
-  // additionalRate: integer("additional_rate"),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
-  // updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
 });
+
+export const basicCoverageRelations = relations(basicCoverage, ({ one }) => ({
+  product: one(products, {
+    fields: [basicCoverage.productId],
+    references: [products.id],
+  }),
+}));
 
 export type BasicCoverage = typeof basicCoverage.$inferSelect;
 
@@ -205,58 +213,66 @@ export const additionalCoverage = pgTable("additional_coverage", {
   description: text("description").notNull(),
   benefitDetails: text("benefit_details").notNull(),
   active: boolean("active").default(true).notNull(),
-  // isOptional: boolean("is_optional").default(false).notNull(),
   isPercentage: boolean("is_percentage").default(false).notNull(),
   additionalRate: integer("additional_rate"),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
-  // updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
 });
+
+export const additionalCoverageRelations = relations(
+  additionalCoverage,
+  ({ one }) => ({
+    product: one(products, {
+      fields: [additionalCoverage.productId],
+      references: [products.id],
+    }),
+    policyToAdditionalCoverage: one(policyToAdditionalCoverage, {
+      fields: [additionalCoverage.id],
+      references: [policyToAdditionalCoverage.additionalCoverageId],
+    }),
+  }),
+);
 
 export type AdditionalCoverage = typeof additionalCoverage.$inferSelect;
 
-export const bonusCoverage = pgTable("bonus_coverage", {
-  id: serial("id").primaryKey(),
-  productCombinationId: integer("product_combination_id").references(
-    () => productCombination.id,
-  ),
-  name: varchar("name", { length: 50 }).notNull(),
-  description: text("description").notNull(),
-  bonusCriteria: text("bonus_criteria").notNull(),
-  active: boolean("active").default(true).notNull(),
-  createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
-  // updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
-});
+// export const bonusCoverage = pgTable("bonus_coverage", {
+//   id: serial("id").primaryKey(),
+//   productCombinationId: integer("product_combination_id").references(
+//     () => productCombination.id,
+//   ),
+//   name: varchar("name", { length: 50 }).notNull(),
+//   description: text("description").notNull(),
+//   bonusCriteria: text("bonus_criteria").notNull(),
+//   active: boolean("active").default(true).notNull(),
+//   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+//   // updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
+// });
 
-export const bonusCoverageRelations = relations(
-  bonusCoverage,
-  ({ one, many }) => ({
-    productCombination: one(productCombination, {
-      fields: [bonusCoverage.productCombinationId],
-      references: [productCombination.id],
-    }),
-    // packageToBonusCoverage: many(packageToBonusCoverage),
-  }),
-);
+// export const bonusCoverageRelations = relations(bonusCoverage, ({ one }) => ({
+//   productCombination: one(productCombination, {
+//     fields: [bonusCoverage.productCombinationId],
+//     references: [productCombination.id],
+//   }),
+// }));
 
-export type BonusCoverage = typeof bonusCoverage.$inferSelect;
+// export type BonusCoverage = typeof bonusCoverage.$inferSelect;
 
-export const productCombination = pgTable("product_combination", {
-  id: serial("id").primaryKey(),
-  productIds: json("product_ids").$type<number[]>().notNull(),
-});
+// export const productCombination = pgTable("product_combination", {
+//   id: serial("id").primaryKey(),
+//   productIds: json("product_ids").$type<number[]>().notNull(),
+// });
 
-export const productCombinationRelations = relations(
-  productCombination,
-  ({ one, many }) => ({
-    products: one(products, {
-      fields: [productCombination.productIds],
-      references: [products.id],
-    }),
-    bonusCoverages: many(bonusCoverage),
-  }),
-);
+// export const productCombinationRelations = relations(
+//   productCombination,
+//   ({ one, many }) => ({
+//     products: one(products, {
+//       fields: [productCombination.productIds],
+//       references: [products.id],
+//     }),
+//     bonusCoverages: many(bonusCoverage),
+//   }),
+// );
 
-export type ProductCombination = typeof productCombination.$inferSelect;
+// export type ProductCombination = typeof productCombination.$inferSelect;
 
 export const policyToAdditionalCoverage = pgTable(
   "policy_to_additional_coverage",
@@ -271,7 +287,7 @@ export const policyToAdditionalCoverage = pgTable(
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
   },
   (t) => ({
-    pk: primaryKey(t.policyId, t.additionalCoverageId),
+    pk: primaryKey({ columns: [t.policyId, t.additionalCoverageId] }),
   }),
 );
 
@@ -294,9 +310,10 @@ export const policyToAdditionalCoverage = pgTable(
 
 export const payments = pgTable("payments", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id")
-    .notNull()
-    .references(() => users.id),
+  // userId: integer("user_id")
+  //   .notNull()
+  //   .references(() => users.id),
+  packageId: integer("package_id").references(() => packages.id),
   discountRuleId: integer("discount_rule_id").references(
     () => discountRules.id,
   ),
@@ -307,9 +324,9 @@ export const payments = pgTable("payments", {
 });
 
 export const paymentRelations = relations(payments, ({ one }) => ({
-  package: one(users, {
-    fields: [payments.userId],
-    references: [users.id],
+  package: one(packages, {
+    fields: [payments.packageId],
+    references: [packages.id],
   }),
 }));
 
@@ -329,17 +346,3 @@ export const policyToAdditionalCoverageRelation = relations(
     }),
   }),
 );
-
-// export const packageToBonusCoverageRelation = relations(
-//   packageToBonusCoverage,
-//   ({ one }) => ({
-//     package: one(packages, {
-//       fields: [packageToBonusCoverage.packageId],
-//       references: [packages.id],
-//     }),
-//     bonusCoverage: one(bonusCoverage, {
-//       fields: [packageToBonusCoverage.bonusCoverageId],
-//       references: [bonusCoverage.id],
-//     }),
-//   }),
-// );

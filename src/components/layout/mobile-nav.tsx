@@ -16,7 +16,7 @@ export default function MobileNav() {
 
   return (
     <>
-      <div className="py-2 px-6 border-b border-slate-200  flex justify-between items-center">
+      <div className="py-2 px-6 border-b border-slate-200 flex justify-between items-center">
         <Link href="/" className="flex gap-1 items-center">
           <Image src={Logo} alt="Takaful Logo" width={25} layout="fixed" />
           <p

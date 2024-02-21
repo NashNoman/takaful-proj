@@ -17,17 +17,18 @@ import { useState } from "react";
 type Props = {
   className?: string;
   value: Date;
+  autoFocus?: boolean;
   onChange: SelectSingleEventHandler;
 };
 
-export function DatePicker({ className, value, onChange }: Props) {
+export function DatePicker({ className, value, autoFocus, onChange }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   const maxDate = subYears(new Date(), 18);
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
+      <PopoverTrigger asChild autoFocus={autoFocus}>
         <Button
           variant={"outline"}
           className={cn(
