@@ -2,6 +2,8 @@
 
 import { StateMachineProvider, createStore } from "little-state-machine";
 
+const storage = {};
+
 type Props = {
   children: React.ReactNode;
 };
@@ -82,7 +84,6 @@ createStore(
   },
   {
     name: "signupForm",
-    storageType: localStorage,
   },
 );
 
